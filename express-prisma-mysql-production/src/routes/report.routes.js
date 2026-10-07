@@ -1,0 +1,10 @@
+import express from "express";
+import { authenticate, authorize } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+import * as controller from "../controllers/report.controller.js";
+import * as schemas from "../validators/report.validator.js";
+const router = express.Router();
+router.get("/admin/reports/summary", authenticate, authorize("SUPER_ADMIN"), validate(schemas.adminReportSchema), asyncHandler(controller.adminSummary));
+router.get("/businesses/:businessId/reports/summary", authenticate, authorize("BUSINESS_OWNER"), validate(schemas.businessReportSchema), asyncHandler(controller.businessSummary));
+export default router;

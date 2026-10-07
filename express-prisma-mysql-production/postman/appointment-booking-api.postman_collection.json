@@ -1,0 +1,1995 @@
+{
+  "info": {
+    "name": "Multi-Business Appointment Booking API",
+    "description": "Postman collection covering every registered API route. Protected requests send the JWT as the accessToken cookie populated by role login requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@example.com"
+    },
+    {
+      "key": "adminPassword",
+      "value": "Admin@12345"
+    },
+    {
+      "key": "ownerEmail",
+      "value": "owner@example.com"
+    },
+    {
+      "key": "ownerPassword",
+      "value": "Owner@12345"
+    },
+    {
+      "key": "staffEmail",
+      "value": "staff@example.com"
+    },
+    {
+      "key": "staffPassword",
+      "value": "Staff@12345"
+    },
+    {
+      "key": "customerEmail",
+      "value": "customer@example.com"
+    },
+    {
+      "key": "customerPassword",
+      "value": "Customer@12345"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": "1"
+    },
+    {
+      "key": "businessId",
+      "value": "1"
+    },
+    {
+      "key": "serviceId",
+      "value": "1"
+    },
+    {
+      "key": "staffId",
+      "value": "1"
+    },
+    {
+      "key": "userId",
+      "value": "1"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "ownerToken",
+      "value": ""
+    },
+    {
+      "key": "staffToken",
+      "value": ""
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "serviceId2",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "1"
+    },
+    {
+      "key": "pricingRuleId",
+      "value": "1"
+    },
+    {
+      "key": "holidayId",
+      "value": "1"
+    },
+    {
+      "key": "bookingStartAt",
+      "value": ""
+    },
+    {
+      "key": "bookingCancelId",
+      "value": "1"
+    },
+    {
+      "key": "bookingCancelStartAt",
+      "value": ""
+    },
+    {
+      "key": "planId",
+      "value": "1"
+    },
+    {
+      "key": "subscriptionId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "API root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Super Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const match = pm.response.headers.get(\"Set-Cookie\")?.match(/accessToken=([^;]+)/);",
+                  "if (match) pm.collectionVariables.set(\"adminToken\", decodeURIComponent(match[1]));",
+                  "if (match) pm.collectionVariables.set(\"accessToken\", decodeURIComponent(match[1]));",
+                  "if (pm.response.code === 200) pm.test(\"Login succeeded\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Business Owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{ownerEmail}}\",\n  \"password\": \"{{ownerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const match = pm.response.headers.get(\"Set-Cookie\")?.match(/accessToken=([^;]+)/);",
+                  "if (match) pm.collectionVariables.set(\"ownerToken\", decodeURIComponent(match[1]));",
+                  "if (match) pm.collectionVariables.set(\"accessToken\", decodeURIComponent(match[1]));",
+                  "if (pm.response.code === 200) pm.test(\"Login succeeded\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Staff",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const match = pm.response.headers.get(\"Set-Cookie\")?.match(/accessToken=([^;]+)/);",
+                  "if (match) pm.collectionVariables.set(\"staffToken\", decodeURIComponent(match[1]));",
+                  "if (match) pm.collectionVariables.set(\"accessToken\", decodeURIComponent(match[1]));",
+                  "if (pm.response.code === 200) pm.test(\"Login succeeded\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const match = pm.response.headers.get(\"Set-Cookie\")?.match(/accessToken=([^;]+)/);",
+                  "if (match) pm.collectionVariables.set(\"customerToken\", decodeURIComponent(match[1]));",
+                  "if (match) pm.collectionVariables.set(\"accessToken\", decodeURIComponent(match[1]));",
+                  "if (pm.response.code === 200) pm.test(\"Login succeeded\", () => pm.expect(pm.response.code).to.eql(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "description": ""
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.collectionVariables.unset(\"accessToken\");"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Run the login for the role you need. The JWT is saved to both accessToken and that role's token variable; role folders use their matching token."
+    },
+    {
+      "name": "Public - Categories",
+      "item": [
+        {
+          "name": "List active categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/categories",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Super Admin - Categories",
+      "item": [
+        {
+          "name": "Create category (Super Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/categories",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Wellness\",\n  \"description\": \"Wellness and personal care services\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"categoryId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update category (Super Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated category description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Super Admin - Businesses",
+      "item": [
+        {
+          "name": "List businesses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/businesses?page=1&limit=20&search=&status=ACTIVE",
+            "description": ""
+          }
+        },
+        {
+          "name": "Get business",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/businesses/{{businessId}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Set business status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/businesses/{{businessId}}/status",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Business Owner - Businesses",
+      "item": [
+        {
+          "name": "Register business",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Northside Studio\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"description\": \"Appointments by reservation\",\n  \"email\": \"hello@northside.example\",\n  \"phone\": \"+919876543210\",\n  \"address\": \"12 Market Road\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"country\": \"India\",\n  \"timezone\": \"Asia/Kolkata\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"businessId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List my businesses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/mine",
+            "description": ""
+          }
+        },
+        {
+          "name": "Get my business",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Update my business",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated business description\",\n  \"city\": \"Pune\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Business Owner - Services",
+      "item": [
+        {
+          "name": "List services",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/services",
+            "description": ""
+          }
+        },
+        {
+          "name": "Create service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/services",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Consultation\",\n  \"description\": \"Initial consultation\",\n  \"durationMinutes\": 45,\n  \"basePrice\": 750,\n  \"capacity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"serviceId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create another service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/services",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Follow-up\",\n  \"description\": \"Follow-up appointment\",\n  \"durationMinutes\": 30,\n  \"basePrice\": 400,\n  \"capacity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"serviceId2\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update service",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/services/{{serviceId}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"basePrice\": 850,\n  \"durationMinutes\": 60,\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Business Owner - Staff",
+      "item": [
+        {
+          "name": "List staff",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/staff",
+            "description": ""
+          }
+        },
+        {
+          "name": "Create staff member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/staff",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alex Staff\",\n  \"email\": \"alex.staff@example.com\",\n  \"phone\": \"+919876543211\",\n  \"password\": \"ChangeMe123!\",\n  \"employeeCode\": \"STF-001\",\n  \"designation\": \"Consultant\",\n  \"serviceIds\": [\n    \"{{serviceId}}\",\n    \"{{serviceId2}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"staffId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update staff member",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/staff/{{staffId}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"designation\": \"Senior Consultant\",\n  \"status\": \"ACTIVE\",\n  \"serviceIds\": [\n    \"{{serviceId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Business Owner - Scheduling and Pricing",
+      "description": "Set working hours and staff availability before creating a booking. Booking rule and pricing settings are business-specific.",
+      "item": [
+        {
+          "name": "Set business working hours (0=Sun?6=Sat)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/working-hours",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hours\": [\n    {\n      \"dayOfWeek\": 0,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 1,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 2,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 3,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 4,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 5,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 6,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Set staff availability",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/staff/{{staffId}}/availability",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hours\": [\n    {\n      \"dayOfWeek\": 0,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 1,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 2,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 3,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 4,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 5,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    },\n    {\n      \"dayOfWeek\": 6,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List business holidays",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/holidays"
+          }
+        },
+        {
+          "name": "Create holiday",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/holidays",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"holidayDate\": \"2026-12-25\",\n  \"name\": \"Christmas Day\",\n  \"isFullDay\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"holidayId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set configurable booking rules",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/booking-rules",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rules\": [\n    {\n      \"ruleKey\": \"MAX_DAILY_BOOKINGS\",\n      \"ruleName\": \"Daily booking limit\",\n      \"ruleValue\": \"50\"\n    },\n    {\n      \"ruleKey\": \"MIN_ADVANCE_MINUTES\",\n      \"ruleName\": \"Minimum notice\",\n      \"ruleValue\": \"30\"\n    },\n    {\n      \"ruleKey\": \"MAX_ADVANCE_DAYS\",\n      \"ruleName\": \"Maximum advance booking window\",\n      \"ruleValue\": \"180\"\n    },\n    {\n      \"ruleKey\": \"CANCELLATION_WINDOW_MINUTES\",\n      \"ruleName\": \"Cancellation notice\",\n      \"ruleValue\": \"60\"\n    },\n    {\n      \"ruleKey\": \"RESCHEDULE_WINDOW_MINUTES\",\n      \"ruleName\": \"Reschedule notice\",\n      \"ruleValue\": \"60\"\n    },\n    {\n      \"ruleKey\": \"CUSTOMER_CANCELLATION_ALLOWED\",\n      \"ruleName\": \"Customer cancellation allowed\",\n      \"ruleValue\": \"true\"\n    },\n    {\n      \"ruleKey\": \"CUSTOMER_RESCHEDULE_ALLOWED\",\n      \"ruleName\": \"Customer reschedule allowed\",\n      \"ruleValue\": \"true\"\n    },\n    {\n      \"ruleKey\": \"MAX_SERVICES_PER_BOOKING\",\n      \"ruleName\": \"Services per booking\",\n      \"ruleValue\": \"10\"\n    },\n    {\n      \"ruleKey\": \"TIME_SLOT_CAPACITY\",\n      \"ruleName\": \"Concurrent service capacity\",\n      \"ruleValue\": \"1\"\n    },\n    {\n      \"ruleKey\": \"AUTO_CONFIRM_BOOKINGS\",\n      \"ruleName\": \"Automatically confirm bookings\",\n      \"ruleValue\": \"false\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List pricing rules",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/pricing-rules"
+          }
+        },
+        {
+          "name": "Create peak pricing rule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/pricing-rules",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Daytime peak\",\n  \"ruleType\": \"PEAK\",\n  \"priority\": 10,\n  \"adjustmentType\": \"PERCENTAGE\",\n  \"adjustmentValue\": 10,\n  \"conditionsJson\": {\n    \"startTime\": \"09:00\",\n    \"endTime\": \"17:00\"\n  },\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"pricingRuleId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get working hours",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/working-hours"
+          }
+        },
+        {
+          "name": "Get staff availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/staff/{{staffId}}/availability"
+          }
+        },
+        {
+          "name": "Get booking rules",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/booking-rules"
+          }
+        },
+        {
+          "name": "Update pricing rule",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/pricing-rules/{{pricingRuleId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority\": 20,\n  \"adjustmentValue\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer - Multi-Service Bookings",
+      "description": "Sign in as Customer. Booking response includes the automatically assigned staff for each service and pricing/assignment explanations.",
+      "item": [
+        {
+          "name": "Check time and price (no booking created)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/availability",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessId\": \"{{businessId}}\",\n  \"startAt\": \"{{bookingStartAt}}\",\n  \"serviceIds\": [\n    \"{{serviceId}}\",\n    \"{{serviceId2}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Checks schedule and returns assignment and pricing explanations without saving a booking."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const date = new Date(Date.now() + 14 * 86400000);",
+                  "date.setUTCHours(7, 0, 0, 0);",
+                  "pm.collectionVariables.set(\"bookingStartAt\", date.toISOString());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create multi-service booking (staff auto-assigned)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessId\": \"{{businessId}}\",\n  \"startAt\": \"{{bookingStartAt}}\",\n  \"serviceIds\": [\n    \"{{serviceId}}\",\n    \"{{serviceId2}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const date = new Date(Date.now() + 14 * 86400000);",
+                  "date.setUTCHours(7, 0, 0, 0);",
+                  "pm.collectionVariables.set(\"bookingStartAt\", date.toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"bookingId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List my bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/mine?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Get my booking",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/{{bookingId}}"
+          }
+        },
+        {
+          "name": "Reschedule my booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/reschedule",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startAt\": \"{{bookingStartAt}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const date = new Date(Date.now() + 14 * 86400000);",
+                  "date.setUTCHours(7, 0, 0, 0);",
+                  "pm.collectionVariables.set(\"bookingStartAt\", date.toISOString());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create a separate booking for cancellation example",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessId\": \"{{businessId}}\",\n  \"startAt\": \"{{bookingCancelStartAt}}\",\n  \"serviceIds\": [\n    \"{{serviceId}}\",\n    \"{{serviceId2}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const date = new Date(Date.now() + 15 * 86400000);",
+                  "date.setUTCHours(7, 0, 0, 0);",
+                  "pm.collectionVariables.set(\"bookingCancelStartAt\", date.toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"bookingCancelId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Business Owner - Appointments",
+      "item": [
+        {
+          "name": "List business bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/bookings?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Confirm booking",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/bookings/{{bookingId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff - Assigned Appointments",
+      "description": "The seeded sample staff account has no StaffProfile; use a staff account created for a business to call these endpoints.",
+      "item": [
+        {
+          "name": "Login as newly created staff member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex.staff@example.com\",\n  \"password\": \"ChangeMe123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const match = pm.response.headers.get(\"Set-Cookie\")?.match(/accessToken=([^;]+)/);",
+                  "if (match) pm.collectionVariables.set(\"staffToken\", decodeURIComponent(match[1]));",
+                  "if (match) pm.collectionVariables.set(\"accessToken\", decodeURIComponent(match[1]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List my assigned bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{staffToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/staff/bookings/mine?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Update assigned appointment status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{staffToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/staff/bookings/{{bookingId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Super Admin - Users",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users?page=1&limit=10&search=",
+            "description": ""
+          }
+        },
+        {
+          "name": "Get user",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users/{{userId}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Customer\",\n  \"email\": \"new.customer@example.com\",\n  \"password\": \"ChangeMe123!\",\n  \"role\": \"CUSTOMER\",\n  \"phone\": \"+919876543299\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"userId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update user",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users/{{userId}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Customer\",\n  \"email\": \"updated.customer@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registration and Public Catalog",
+      "item": [
+        {
+          "name": "Register customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/register/customer",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Customer\",\n  \"email\": \"new-customer@example.com\",\n  \"password\": \"ChangeMe123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Register business owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/register/business-owner",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Owner\",\n  \"email\": \"new-owner@example.com\",\n  \"password\": \"ChangeMe123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Search businesses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/businesses?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Business details and services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/catalog/businesses/{{businessId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff Availability",
+      "item": [
+        {
+          "name": "View own availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{staffToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/staff/availability"
+          }
+        },
+        {
+          "name": "Replace own availability",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{staffToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/staff/availability",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hours\": [\n    {\n      \"dayOfWeek\": 1,\n      \"startTime\": \"09:00\",\n      \"endTime\": \"17:00\",\n      \"isActive\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions and Reports",
+      "item": [
+        {
+          "name": "List plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/subscriptions/plans"
+          }
+        },
+        {
+          "name": "Create plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/admin/plans",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Starter Monthly\",\n  \"price\": 0,\n  \"billingCycle\": \"MONTHLY\",\n  \"maxStaff\": 5,\n  \"maxServices\": 20,\n  \"maxMonthlyBookings\": 500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"planId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update plan",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/admin/plans/{{planId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 9.99,\n  \"status\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete plan",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/admin/plans/{{planId}}"
+          }
+        },
+        {
+          "name": "Update subscription status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/admin/subscriptions/{{subscriptionId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/admin/subscriptions?page=1&limit=20"
+          }
+        },
+        {
+          "name": "View business subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/businesses/{{businessId}}"
+          }
+        },
+        {
+          "name": "Subscribe business to plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/subscriptions/businesses/{{businessId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const payload = pm.response.json();",
+                  "if (pm.response.code >= 200 && pm.response.code < 300 && payload.data?.id) pm.collectionVariables.set(\"subscriptionId\", payload.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin report summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/reports/summary"
+          }
+        },
+        {
+          "name": "Business report summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/reports/summary"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cleanup (optional; run last)",
+      "description": "Destructive soft-delete/deactivation examples. Run only after completing the other requests.",
+      "item": [
+        {
+          "name": "Delete category (Super Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/categories/{{categoryId}}",
+            "description": "Soft-delete the category. Run only after all business examples are complete."
+          }
+        },
+        {
+          "name": "Delete service (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/services/{{serviceId}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Deactivate staff member",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/staff/{{staffId}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Delete user",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users/{{userId}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Cancel my booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{customerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/bookings/{{bookingCancelId}}/cancel",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete holiday",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/holidays/{{holidayId}}"
+          }
+        },
+        {
+          "name": "Delete pricing rule",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{ownerToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/businesses/{{businessId}}/pricing-rules/{{pricingRuleId}}"
+          }
+        },
+        {
+          "name": "Delete business (soft delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{adminToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/businesses/{{businessId}}",
+            "description": ""
+          }
+        }
+      ]
+    }
+  ]
+}

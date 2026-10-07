@@ -1,0 +1,725 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  SUPER_ADMIN
+  BUSINESS_OWNER
+  STAFF
+  CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum BusinessStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ServiceStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum StaffStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+  NO_SHOW
+}
+
+enum BookingItemStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+  NO_SHOW
+}
+
+enum PricingRuleType {
+  PEAK
+  OFF_PEAK
+  COMBINATION
+  CUSTOM
+}
+
+enum AdjustmentType {
+  PERCENTAGE
+  FIXED
+}
+
+enum RuleType {
+  NUMBER
+  BOOLEAN
+  STRING
+  JSON
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+  PENDING
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+// ============================================================
+// USERS
+// ============================================================
+
+model User {
+  id           Int        @id @default(autoincrement())
+  name         String     @db.VarChar(100)
+  email        String     @unique @db.VarChar(191)
+  phone        String?    @unique @db.VarChar(20)
+  passwordHash String     @db.VarChar(255)
+  role         UserRole
+  status       UserStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Business ownership
+  ownedBusinesses Business[] @relation("BusinessOwner")
+
+  // Staff profile
+  staffProfile StaffProfile?
+
+  // Customer bookings
+  customerBookings Booking[] @relation("CustomerBookings")
+
+  // Booking status history
+  bookingStatusChanges BookingStatusHistory[] @relation("StatusChangedBy")
+
+  @@index([role])
+  @@index([status])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(100)
+  description String? @db.Text
+  status      Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  businesses Business[]
+  services   BusinessService[]
+
+  @@index([status])
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+// ============================================================
+// BUSINESSES
+// ============================================================
+
+model Business {
+  id Int @id @default(autoincrement())
+
+  ownerId    Int
+  categoryId Int
+
+  name        String  @db.VarChar(150)
+  description String? @db.Text
+
+  email String? @db.VarChar(191)
+  phone String? @db.VarChar(20)
+
+  address String? @db.Text
+  city    String? @db.VarChar(100)
+  state   String? @db.VarChar(100)
+  country String? @db.VarChar(100)
+
+  timezone String @default("Asia/Kolkata") @db.VarChar(100)
+
+  status BusinessStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  owner    User     @relation("BusinessOwner", fields: [ownerId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  services BusinessService[]
+  staff    StaffProfile[]
+
+  workingHours WorkingHour[]
+  holidays     Holiday[]
+  pricingRules PricingRule[]
+  bookingRules BookingRule[]
+
+  bookings Booking[]
+
+  subscriptions BusinessSubscription[]
+
+  @@index([ownerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([deletedAt])
+  @@index([city])
+  @@map("businesses")
+}
+
+// ============================================================
+// SERVICES
+// ============================================================
+
+model BusinessService {
+  id Int @id @default(autoincrement())
+
+  businessId Int
+  categoryId Int?
+
+  name        String  @db.VarChar(150)
+  description String? @db.Text
+
+  durationMinutes Int
+
+  basePrice Decimal @db.Decimal(10, 2)
+
+  // Maximum number of simultaneous bookings
+  capacity Int @default(1)
+
+  status ServiceStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business  @relation(fields: [businessId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  staffServices StaffService[]
+  bookingItems  BookingItem[]
+
+  pricingRules PricingRule[]
+
+  @@index([businessId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("business_services")
+}
+
+// ============================================================
+// STAFF
+// ============================================================
+
+model StaffProfile {
+  id Int @id @default(autoincrement())
+
+  userId     Int @unique
+  businessId Int
+
+  employeeCode String? @db.VarChar(50)
+  designation  String? @db.VarChar(100)
+
+  status StaffStatus @default(ACTIVE)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user     User     @relation(fields: [userId], references: [id])
+  business Business @relation(fields: [businessId], references: [id])
+
+  services     StaffService[]
+  availability StaffAvailability[]
+  leaves       StaffLeave[]
+
+  bookingItems BookingItem[]
+
+  pricingRules PricingRule[]
+
+  @@index([businessId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("staff_profiles")
+}
+
+// ============================================================
+// STAFF ↔ SERVICES
+// ============================================================
+
+model StaffService {
+  id Int @id @default(autoincrement())
+
+  staffId   Int
+  serviceId Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  staff   StaffProfile    @relation(fields: [staffId], references: [id])
+  service BusinessService @relation(fields: [serviceId], references: [id])
+
+  @@unique([staffId, serviceId])
+  @@index([staffId])
+  @@index([serviceId])
+  @@index([deletedAt])
+  @@map("staff_services")
+}
+
+// ============================================================
+// BUSINESS WORKING HOURS
+// ============================================================
+
+model WorkingHour {
+  id Int @id @default(autoincrement())
+
+  businessId Int
+
+  // 0 = Sunday, 1 = Monday ... 6 = Saturday
+  dayOfWeek Int
+
+  startTime String @db.VarChar(5)
+  endTime   String @db.VarChar(5)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@index([businessId, dayOfWeek])
+  @@index([deletedAt])
+  @@map("working_hours")
+}
+
+// ============================================================
+// STAFF AVAILABILITY
+// ============================================================
+
+model StaffAvailability {
+  id Int @id @default(autoincrement())
+
+  staffId Int
+
+  dayOfWeek Int
+
+  startTime String @db.VarChar(5)
+  endTime   String @db.VarChar(5)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  staff StaffProfile @relation(fields: [staffId], references: [id])
+
+  @@index([staffId, dayOfWeek])
+  @@index([deletedAt])
+  @@map("staff_availability")
+}
+
+// ============================================================
+// BUSINESS HOLIDAYS
+// ============================================================
+
+model Holiday {
+  id Int @id @default(autoincrement())
+
+  businessId Int
+
+  holidayDate DateTime
+  name        String   @db.VarChar(150)
+
+  isFullDay Boolean @default(true)
+
+  startTime String? @db.VarChar(5)
+  endTime   String? @db.VarChar(5)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@unique([businessId, holidayDate])
+  @@index([holidayDate])
+  @@index([deletedAt])
+  @@map("holidays")
+}
+
+// ============================================================
+// STAFF LEAVES
+// ============================================================
+
+model StaffLeave {
+  id Int @id @default(autoincrement())
+
+  staffId Int
+
+  leaveDate DateTime
+
+  startTime String? @db.VarChar(5)
+  endTime   String? @db.VarChar(5)
+
+  reason String? @db.VarChar(255)
+
+  status LeaveStatus @default(PENDING)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  staff StaffProfile @relation(fields: [staffId], references: [id])
+
+  @@index([staffId, leaveDate])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("staff_leaves")
+}
+
+// ============================================================
+// BOOKINGS
+// ============================================================
+
+model Booking {
+  id Int @id @default(autoincrement())
+
+  bookingNumber String @unique @db.VarChar(30)
+
+  businessId Int
+  customerId Int
+
+  status BookingStatus @default(PENDING)
+
+  subtotal   Decimal @db.Decimal(10, 2)
+  discount   Decimal @default(0) @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  currency String @default("INR") @db.VarChar(3)
+
+  bookedAt DateTime @default(now())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  customer User @relation("CustomerBookings", fields: [customerId], references: [id])
+
+  items BookingItem[]
+
+  statusHistory BookingStatusHistory[]
+
+  @@index([businessId, bookedAt])
+  @@index([customerId, createdAt])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("bookings")
+}
+
+// ============================================================
+// BOOKING ITEMS / APPOINTMENTS
+// ============================================================
+
+model BookingItem {
+  id Int @id @default(autoincrement())
+
+  bookingId Int
+  serviceId Int
+  staffId   Int
+
+  startTime DateTime
+  endTime   DateTime
+
+  durationMinutes Int
+
+  basePrice  Decimal @db.Decimal(10, 2)
+  finalPrice Decimal @db.Decimal(10, 2)
+
+  status BookingItemStatus @default(PENDING)
+
+  pricingExplanation    String? @db.Text
+  assignmentExplanation String? @db.Text
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  booking Booking         @relation(fields: [bookingId], references: [id])
+  service BusinessService @relation(fields: [serviceId], references: [id])
+  staff   StaffProfile    @relation(fields: [staffId], references: [id])
+
+  @@index([bookingId])
+  @@index([serviceId])
+  @@index([staffId, startTime, endTime])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("booking_items")
+}
+
+// ============================================================
+// BOOKING STATUS HISTORY
+// ============================================================
+
+model BookingStatusHistory {
+  id Int @id @default(autoincrement())
+
+  bookingId Int
+
+  oldStatus BookingStatus?
+  newStatus BookingStatus
+
+  changedById Int?
+
+  reason String? @db.Text
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  changedBy User? @relation("StatusChangedBy", fields: [changedById], references: [id])
+
+  @@index([bookingId])
+  @@index([changedById])
+  @@index([deletedAt])
+  @@map("booking_status_history")
+}
+
+// ============================================================
+// DYNAMIC PRICING RULES
+// ============================================================
+
+model PricingRule {
+  id Int @id @default(autoincrement())
+
+  businessId Int
+
+  // Optional because a rule can apply to all services
+  serviceId Int?
+
+  // Optional because a rule can apply to all staff
+  staffId Int?
+
+  name String @db.VarChar(150)
+
+  ruleType PricingRuleType
+
+  priority Int @default(0)
+
+  adjustmentType AdjustmentType
+
+  adjustmentValue Decimal @db.Decimal(10, 2)
+
+  // Configurable rule conditions
+  conditionsJson Json?
+
+  isActive Boolean @default(true)
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business         @relation(fields: [businessId], references: [id])
+  service  BusinessService? @relation(fields: [serviceId], references: [id])
+  staff    StaffProfile?    @relation(fields: [staffId], references: [id])
+
+  @@index([businessId])
+  @@index([serviceId])
+  @@index([staffId])
+  @@index([ruleType])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("pricing_rules")
+}
+
+// ============================================================
+// BOOKING RULES
+// ============================================================
+
+model BookingRule {
+  id Int @id @default(autoincrement())
+
+  businessId Int
+
+  ruleKey  String @db.VarChar(100)
+  ruleName String @db.VarChar(150)
+
+  ruleType RuleType
+
+  // For simple values such as:
+  // 20
+  // true
+  // "60"
+  ruleValue String? @db.Text
+
+  // For complex configurable rules
+  conditionsJson Json?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business @relation(fields: [businessId], references: [id])
+
+  @@unique([businessId, ruleKey])
+  @@index([businessId])
+  @@index([ruleKey])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("booking_rules")
+}
+
+// ============================================================
+// SUBSCRIPTION PLANS
+// ============================================================
+
+model SubscriptionPlan {
+  id Int @id @default(autoincrement())
+
+  name        String  @db.VarChar(100)
+  description String? @db.Text
+
+  price Decimal @db.Decimal(10, 2)
+
+  billingCycle BillingCycle
+
+  maxStaff           Int?
+  maxServices        Int?
+  maxMonthlyBookings Int?
+
+  status Boolean @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  subscriptions BusinessSubscription[]
+
+  @@index([status])
+  @@index([deletedAt])
+  @@map("subscription_plans")
+}
+
+// ============================================================
+// BUSINESS SUBSCRIPTIONS
+// ============================================================
+
+model BusinessSubscription {
+  id Int @id @default(autoincrement())
+
+  businessId Int
+  planId     Int
+
+  startDate DateTime
+  endDate   DateTime?
+
+  status SubscriptionStatus @default(PENDING)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  business Business         @relation(fields: [businessId], references: [id])
+  plan     SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  payments SubscriptionPayment[]
+
+  @@index([businessId])
+  @@index([planId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("business_subscriptions")
+}
+
+// ============================================================
+// SUBSCRIPTION PAYMENTS
+// ============================================================
+
+model SubscriptionPayment {
+  id Int @id @default(autoincrement())
+
+  subscriptionId Int
+
+  amount Decimal @db.Decimal(10, 2)
+
+  currency String @default("INR") @db.VarChar(3)
+
+  transactionId String? @unique @db.VarChar(150)
+
+  paymentStatus PaymentStatus @default(PENDING)
+
+  paidAt DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  subscription BusinessSubscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId])
+  @@index([paymentStatus])
+  @@index([deletedAt])
+  @@map("subscription_payments")
+}

@@ -1,0 +1,55 @@
+.staff-app { min-height: 100vh; color: var(--color-ink); }
+.staff-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; width: 250px; flex-direction: column; padding: 26px 16px 18px; border-right: 1px solid var(--color-line); background: var(--color-surface); }
+.staff-brand-icon { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 10px; background: var(--color-primary); color: white; font-size: 17px; }
+.staff-main { min-height: 100vh; margin-left: 250px; }
+.staff-topbar { position: sticky; top: 0; z-index: 10; display: flex; height: 66px; align-items: center; gap: 18px; padding: 0 30px; border-bottom: 1px solid var(--color-line); background: rgb(255 255 255 / 94%); backdrop-filter: blur(12px); }
+.staff-breadcrumb { display: flex; flex: 1; align-items: center; gap: 11px; font-size: 13px; }
+.staff-topbar-section { color: var(--color-muted); font-size: 10px; font-weight: 700; letter-spacing: .09em; }
+.staff-breadcrumb strong { font-weight: 650; }
+.staff-page { width: min(100%, 1440px); margin: 0 auto; padding: 34px; }
+.staff-dashboard-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, .7fr); gap: 16px; }
+.staff-summary-grid { grid-template-columns: 1fr; max-width: 290px; }
+.staff-overview-note { display: flex; flex-direction: column; gap: 8px; padding: 0 20px 20px; color: var(--color-muted); font-size: 11px; line-height: 1.5; }
+.staff-overview-note strong { color: var(--color-ink); font-size: 12px; }
+.staff-appointment-items { display: grid; gap: 7px; }
+.staff-appointment-items > div { display: flex; flex-direction: column; gap: 3px; }
+.staff-appointment-items strong { color: var(--color-ink); font-size: 10px; }
+.staff-appointment-items small { color: var(--color-muted); font-size: 9px; }
+.staff-availability-row { display: grid; grid-template-columns: 120px 1fr 1fr; gap: 12px; align-items: center; padding: 13px 18px; border-bottom: 1px solid #eef2f1; }
+.staff-availability-row:last-child { border-bottom: 0; }
+.staff-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 17px 20px; border-bottom: 1px solid #eef2f1; }
+.staff-section-heading h2 { margin: 0; font-size: 14px; }
+.staff-section-heading p { margin: 4px 0 0; color: var(--color-muted); font-size: 10px; }
+.staff-closed { color: var(--color-muted); font-size: 11px; }
+.staff-switch { display: flex; align-items: center; gap: 8px; color: var(--color-muted); font-size: 10px; }
+.staff-switch input { accent-color: var(--color-primary); }
+.staff-inline-error { margin: 14px 18px 0; }
+.staff-day { font-size: 11px; font-weight: 650; }
+.staff-availability-periods { display: grid; gap: 8px; }
+.staff-availability-period { display: flex; align-items: center; gap: 12px; }
+.staff-time-field { display: flex; align-items: center; gap: 7px; color: var(--color-muted); font-size: 10px; }
+.staff-time-field input { min-height: 34px; padding: 5px 7px; border: 1px solid var(--color-line); border-radius: 7px; color: var(--color-ink); font-size: 11px; }
+.staff-day-actions { display: flex; align-items: center; gap: 10px; }
+.staff-save-row { display: flex; justify-content: flex-end; padding: 16px 18px; }
+.staff-filterbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding: 15px 16px; }
+.staff-filterbar .admin-field { width: 170px; }
+.staff-filterbar .admin-field input, .staff-filterbar .admin-field select { min-height: 37px; }
+.staff-item-state { color: var(--color-muted); font-size: 9px; }
+.staff-final-status { color: var(--color-muted); font-size: 10px; }
+
+@media (max-width: 1100px) { .staff-page { padding: 26px 22px; } .staff-dashboard-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .staff-sidebar { transform: translateX(-100%); transition: transform 160ms ease; }
+  .staff-sidebar.is-open { transform: translateX(0); }
+  .staff-main { margin-left: 0; }
+  .staff-topbar { height: 58px; gap: 12px; padding: 0 14px; }
+  .staff-topbar-section, .staff-breadcrumb .topbar-divider { display: none; }
+  .staff-breadcrumb { font-size: 12px; }
+  .staff-page { padding: 24px 16px; }
+}
+@media (max-width: 520px) {
+  .staff-availability-row { grid-template-columns: 1fr 1fr; }
+  .staff-day { grid-column: 1 / -1; }
+  .staff-availability-periods, .staff-day-actions { grid-column: 1 / -1; }
+  .staff-availability-period { flex-wrap: wrap; }
+}

@@ -1,0 +1,16 @@
+import express from "express";
+import { authenticate, authorize } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+import * as controller from "../controllers/subscription.controller.js";
+import * as schemas from "../validators/subscription.validator.js";
+const router = express.Router();
+router.get("/plans", validate(schemas.publicPlansSchema), asyncHandler(controller.listPlans));
+router.post("/admin/plans", authenticate, authorize("SUPER_ADMIN"), validate(schemas.createPlanSchema), asyncHandler(controller.createPlan));
+router.patch("/admin/plans/:planId", authenticate, authorize("SUPER_ADMIN"), validate(schemas.updatePlanSchema), asyncHandler(controller.updatePlan));
+router.delete("/admin/plans/:planId", authenticate, authorize("SUPER_ADMIN"), validate(schemas.idSchema), asyncHandler(controller.deletePlan));
+router.get("/admin/subscriptions", authenticate, authorize("SUPER_ADMIN"), validate(schemas.listSubscriptionsSchema), asyncHandler(controller.listSubscriptions));
+router.patch("/admin/subscriptions/:subscriptionId/status", authenticate, authorize("SUPER_ADMIN"), validate(schemas.statusSchema), asyncHandler(controller.updateSubscriptionStatus));
+router.get("/businesses/:businessId", authenticate, authorize("BUSINESS_OWNER"), validate(schemas.businessSubscriptionSchema), asyncHandler(controller.getBusinessSubscription));
+router.post("/businesses/:businessId", authenticate, authorize("BUSINESS_OWNER"), validate(schemas.subscribeSchema), asyncHandler(controller.subscribe));
+export default router;
